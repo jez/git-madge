@@ -5,17 +5,43 @@
 
 # Accepts all arguments that madge does
 
+cred="$(echo -ne '\033[0;31m')"
+ccyan="$(echo -ne '\033[0;36m')"
+cnone="$(echo -ne '\033[0m')"
+
 if [[ $# -eq 0 ]]; then
   madge
   exit 1
 fi
 
+stderr_in_red() {
+  echo -n "$cred" >&2
+  cat - >&2
+  echo -n "$cnone" >&2
+}
+
+color_name() {
+  # Only print color if output is a tty
+  if [ -t 1 ]; then
+    sed -e "s/\(..*\/\)*\(.[^|]*\)/\1$ccyan\2$cnone/"
+  else
+    cat -
+  fi
+}
+
+sorted() {
+  madge --json "$@" | \
+    jq -r 'to_entries[] | .key as $key | .value[] | . + " " + $key' | \
+    tsort 2> >(stderr_in_red)
+}
+
 if [[ "$(git branch | grep '\*')" =~ $REVIEW_BASE ]]; then
   # If on master, show all files in sorted order
-  madge "$@" | grep -v '^\s' --color=never
+  sorted "$@" | color_name
 else
   MERGE_BASE="$(git merge-base HEAD "$REVIEW_BASE")"
-  madge "$@" | grep -v '^\s' --color=never | \
+  sorted "$@" | \
     # If on separate branch, show heatmap for files changed since master
-    grep --color=never -xF -f <(git diff --name-only "$MERGE_BASE")
+    grep -xF -f <(git diff --name-only "$MERGE_BASE") | \
+    color_name
 fi

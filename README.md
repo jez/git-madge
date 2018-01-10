@@ -14,10 +14,11 @@ dependencies, finding circular dependencies, and give you other useful info.
 
 ### Dependencies
 
-Requires that `madge` is on your path:
+Requires that `madge` and `jq` are on your path:
 
 ```
 npm install -g madge
+brew install jq
 ```
 
 ### Installation
