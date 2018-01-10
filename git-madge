@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Git-aware madge
+# See: https://github.com/pahen/madge
+
+# Accepts all arguments that madge does
+
+if [[ $# -eq 0 ]]; then
+  madge
+  exit 1
+fi
+
+if [[ "$(git branch | grep '\*')" =~ $REVIEW_BASE ]]; then
+  # If on master, show all files in sorted order
+  madge "$@" | grep -v '^\s' --color=never
+else
+  MERGE_BASE="$(git merge-base HEAD "$REVIEW_BASE")"
+  madge "$@" | grep -v '^\s' --color=never | \
+    # If on separate branch, show heatmap for files changed since master
+    grep --color=never -xF -f <(git diff --name-only "$MERGE_BASE")
+fi
