@@ -98,6 +98,24 @@ or paths:
 
 [flags]: https://github.com/pahen/madge#cli
 
+## Tips
+
+Use aliases to make the command invocation more convenient. Git lets you make
+per-project aliases, so you can stash the config options required by any given
+project:
+
+```bash
+git config alias.sorted  'madge --basedir . --webpack-config webpack.config.js src'
+# another variant that ignores tests
+git config alias.sortedt 'madge --basedir . --webpack-config webpack.config.js --exclude ".*\.test\.js" src'
+```
+
+Then you can just do this:
+
+```
+git checkout my-branch
+git sorted
+```
 
 ## TODO
 
