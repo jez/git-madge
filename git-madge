@@ -15,9 +15,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 stderr_in_red() {
-  echo -n "$cred" >&2
-  cat - >&2
-  echo -n "$cnone" >&2
+  sed -e "s/\(.*\)/$cred\1$cnone/" >&2
 }
 
 color_name() {
