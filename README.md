@@ -48,20 +48,13 @@ dependencies.
 ```
 ~/demo (master)
 ❯ git madge .
-components/Element.js
-components/Element.test.js
-components/Elements.js
-components/PaymentRequestButtonElement.js
-components/PaymentRequestButtonElement.test.js
-components/Provider.js
-components/Provider.test.js
-components/inject.js
-components/inject.test.js
-decls/Stripe.js
-index.js
-index.test.js
-utils/shallowEqual.js
-utils/shallowEqual.test.js
+src/components/Provider.js
+src/utils/shallowEqual.js
+src/components/Elements.js
+src/components/inject.js
+src/components/PaymentRequestButtonElement.js
+src/components/Element.js
+src/index.js
 ```
 
 If you're on a branch, it'll filter the list to only files that have changed
@@ -71,11 +64,9 @@ sorted order makes it so that you read the leaves first, then move up the tree.
 ```
 ~/demo (my-branch)
 ❯ git madge .
-components/Element.js
-components/Element.test.js
-components/Elements.js
-components/PaymentRequestButtonElement.js
-components/PaymentRequestButtonElement.test.js
+src/components/PaymentRequestButtonElement.js
+src/components/Element.js
+src/index.js
 ```
 
 If you want to filter with respect to a different revision, set `REVIEW_BASE`:
