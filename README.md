@@ -2,13 +2,23 @@
 
 > Git-aware madge wrapper
 
-[Madge] Madge is a developer tool for generating a visual graph of your module
-dependencies, finding circular dependencies, and give you other useful info.
+[Madge] is tool for slicing and dicing the dependencies of your JavaScript
+project. `git-madge` is a simple wrapper for [Madge] that makes it git-aware. It
+looks at files that have changed since `master` (or all files if on `master`),
+and prints them, sorted by their dependencies.
 
 [Madge]: https://github.com/pahen/madge
 
-`git-madge` is a simple wrapper that makes it git-aware.
+For example, if a repo's dependency graph looks like this:
 
+![](graph.png)
+
+then `git-madge` will generate this listing:
+
+![](screenshot.png)
+
+You can use this list when code reviewing a branch (to order the files you look
+at).
 
 ## Install
 
@@ -87,6 +97,12 @@ or paths:
 ```
 
 [flags]: https://github.com/pahen/madge#cli
+
+
+## TODO
+
+- [ ] Support generating images filtering by list of changed files (instead of
+  only printing them).
 
 
 ## License
