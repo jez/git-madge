@@ -110,9 +110,35 @@ git sorted
 
 ## TODO
 
-- [ ] Support generating images filtering by list of changed files (instead of
-  only printing them).
+- [ ] Double check that this currently works.
+  - Test on lots of branches
+  - Make sure that all files show up (some seem to be getting dropped...)
 
+- [ ] Support generating images filtering by list of changed files (instead of
+  only printing them). This seems doable:
+  - Generate the `--dot` file for the entire repo
+  - Cache `git files` with `mktemp`
+  - Write a `gvpr` program that looks at every node (must be in `git files`) and
+    every edge (endpoints must both be in `git files`)
+    - (You can use the `system(cmd : string) : int` function to run `grep`)
+  - Run the `gvpr` script on the DOT file
+  - Use graphviz directly to format the graph
+  - optional: Use `imgcat` to cat the image directly:
+
+```bash
+dot |\
+  -Tpng |\
+  -Gdpi=200 |\
+  -Gfixedsize=true |\
+  -Gbgcolor=transparent |\
+  -Nfontname=Menlo |\
+  -Nfontsize=14px |\
+  -Ncolor=white |\
+  -Nfontcolor=white |\
+  -Ecolor=white |\
+  deps.dot |\
+  imgcat
+```
 
 ## License
 
