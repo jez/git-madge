@@ -168,7 +168,7 @@ git config alias.sorted  'madge sorted --basedir . --webpack-config webpack.conf
 git config alias.sortedt 'madge sorted --basedir . --webpack-config webpack.config.js --exclude ".*\.test\.js" src'
 
 # show the dependency image
-git config alias.image 'madge image --basedir . --webpack-config webpack.config.js --exclude ".*\.test\.js" src'
+git config alias.depgraph 'madge image --basedir . --webpack-config webpack.config.js --exclude ".*\.test\.js" src'
 ```
 
 Then you can just do this:
@@ -176,8 +176,15 @@ Then you can just do this:
 ```
 git checkout my-branch
 git sorted
-git sorted | imgcat
+git depgraph | imgcat
 ```
+
+## Styles
+
+Available stylesheets are in the [styles/](styles/) directory.
+
+Feel free to copy one, modify it, and contribute it back! Pull requests are very
+welcome.
 
 ## License
 
