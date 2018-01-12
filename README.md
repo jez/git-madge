@@ -3,22 +3,25 @@
 > Git-aware madge wrapper
 
 [Madge] is tool for slicing and dicing the dependencies of your JavaScript
-project. `git-madge` is a simple wrapper for [Madge] that makes it git-aware. It
-looks at files that have changed since `master` (or all files if on `master`),
-and prints them, sorted by their dependencies.
+project. `git-madge` is a wrapper for [Madge] that makes it git-aware. This
+means that it understands what branch you're on, and only runs on those files
+that have changed by this branch.
 
 [Madge]: https://github.com/pahen/madge
 
-For example, if a repo's dependency graph looks like this:
+`git-madge` can do two main things right now:
 
-![](graph.png)
+- list files in order of their dependencies
+- draw a graph of dependencies
 
-then `git-madge` will generate this listing:
+![screenshot](screenshot-master.png)
 
-![](screenshot.png)
+If you're on a branch, the output gets limited to only those files that changed
+in this branch:
 
-You can use this list when code reviewing a branch (to order the files you look
-at).
+![screenshot](screenshot-branch.png)
+
+(Note: we're rendering images in the terminal with iTerm2's `imgcat` program.)
 
 ## Install
 
