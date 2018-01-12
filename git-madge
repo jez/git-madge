@@ -182,7 +182,7 @@ image() {
   esac
 
   dump_dot "$@" | \
-    (grep -q '.' || echo "Did any JavaScript files change on this branch?" | \
+    (grep '.' || echo "Did any JavaScript files change on this branch?" | \
       stderr_in_red >&2) | \
     gvpr -c -f "$STYLE" | \
     dot -Tpng
