@@ -5,18 +5,127 @@
 
 # Accepts all arguments that madge does
 
+SCRIPTPATH="$( cd "$(dirname "$0")" || exit 1; pwd -P )"
+
 cred="$(echo -ne '\033[0;31m')"
 ccyan="$(echo -ne '\033[0;36m')"
 cnone="$(echo -ne '\033[0m')"
 
-if [[ $# -eq 0 ]]; then
-  madge
-  exit 1
-fi
+# bash unofficial strict mode
+set -euo pipefail
 
 stderr_in_red() {
   sed -e "s/\(.*\)/$cred\1$cnone/" >&2
 }
+
+usage() {
+  if [ -n "$*" ]; then
+    echo "$*" | stderr_in_red
+    echo
+  fi
+
+  cat <<EOF
+Git-aware madge.
+
+Usage:
+  git madge sorted [options] <madge option>...
+  git madge dot    [options] <madge option>...  >  <filename>.dot
+  git madge image  [options] <madge option>...  >  <filename>.png
+
+Options:
+  -b <branch>, --base <branch>  Limit madge to files changed by <branch>. If on
+                                <branch>, operate on all files in the repo.
+                                [default: master]
+  -s <style>, --style <style>   Use <style> when generating a graphviz image.
+                                Can be a preset or a path to a graphviz program
+                                that styles the graph.
+                                [default: white]
+  -h
+
+Madge Options:
+  Madge requires at least a path in which to find JavaScript files.
+  You may also wish to configure things like webpack loaders.
+EOF
+
+  madge
+  exit 1
+}
+
+main() {
+  case "$COMMAND" in
+    sorted)
+      sorted "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
+      ;;
+    dot)
+      dump_dot "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
+      ;;
+    image)
+      image "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
+      ;;
+    *)
+      usage "Unrecognized subcommand: $COMMAND"
+      ;;
+  esac
+}
+
+# ----- option parsing --------------------------------------------------------
+
+COMMAND=""
+MADGE_ARGV=()
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    sorted|dot|image)
+      COMMAND="$1"
+      shift
+      ;;
+    -b|--base)
+      REVIEW_BASE="$2"
+      shift
+      shift
+      ;;
+    -s|--style)
+      STYLE="$2"
+      shift
+      shift
+      ;;
+    -h)
+      usage ""
+      ;;
+    *)
+      MADGE_ARGV+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$COMMAND" ]; then
+  usage "Must provide a subcommand (sorted, image, ...)"
+fi
+
+if [[ ${#MADGE_ARGV[@]} -eq 0 ]]; then
+  usage "No madge options provided. madge requres at least a path."
+fi
+
+REVIEW_BASE=${REVIEW_BASE:-master}
+STYLE=${STYLE:-white}
+
+
+# ----- helpers ---------------------------------------------------------------
+
+on_master() {
+  [[ "$(git branch | grep '\*')" =~ $REVIEW_BASE ]]
+}
+
+git_files() {
+  local merge_base
+  merge_base="$(git merge-base HEAD "$REVIEW_BASE")"
+  git diff --name-only "$merge_base"
+}
+
+# ----- commands --------------------------------------------------------------
+
+# --- sorted ---
 
 color_name() {
   # Only print color if output is a tty
@@ -27,19 +136,57 @@ color_name() {
   fi
 }
 
-sorted() {
+list() {
   madge --json "$@" | \
     jq -r 'to_entries[] | .key as $key | .value[] | . + " " + $key' | \
+    # Unix comes with a topological sort command. Isn't that nutty?
     tsort 2> >(stderr_in_red)
 }
 
-if [[ "$(git branch | grep '\*')" =~ $REVIEW_BASE ]]; then
+sorted() {
   # If on master, show all files in sorted order
-  sorted "$@" | color_name
-else
-  MERGE_BASE="$(git merge-base HEAD "$REVIEW_BASE")"
-  sorted "$@" | \
-    # If on separate branch, show heatmap for files changed since master
-    grep -xF -f <(git diff --name-only "$MERGE_BASE") | \
+  # Otherwise, filter to only files changed since master
+  list "$@" | \
+    if on_master; then cat -; else grep -xF -f <(git_files); fi | \
     color_name
-fi
+}
+
+# --- dot ---
+
+repo_subgraph() {
+  # Cache the list of files changed on this branch so we can
+  # grep it multiple times (once per node) without recomputing.
+  GIT_FILES="$(mktemp)"
+  git_files > "$GIT_FILES"
+
+  gvpr -i "N [system(sprintf(\"grep -q %s %s\", name, \"$GIT_FILES\")) == 0]"
+}
+
+dump_dot() {
+  # If on master, include all files in DOT graph
+  # Otherwise, use the subgraph induced by files changed since master
+  madge --dot "$@" | \
+    if on_master; then cat -; else repo_subgraph; fi
+}
+
+# --- image ---
+
+image() {
+  case $STYLE in
+    white)
+      STYLE="$SCRIPTPATH/styles/white.gv"
+      ;;
+    */*)
+      ;;
+    *)
+      usage "Unrecognized style: $STYLE."
+      ;;
+  esac
+
+  dump_dot "$@" | \
+    gvpr -c -f "$STYLE" | \
+    dot -Tpng
+}
+
+main
+
