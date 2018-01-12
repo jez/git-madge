@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-# Git-aware madge
-# See: https://github.com/pahen/madge
-
-# Accepts all arguments that madge does
-
-SCRIPTPATH="$( cd "$(dirname "$0")" || exit 1; pwd -P )"
+# Get paths where source files are located. http://stackoverflow.com/a/42918
+BINDIR="$(dirname "$(perl -MCwd -le 'print Cwd::abs_path(shift)' "${BASH_SOURCE[0]}")")"
+ROOTDIR="$(dirname "$BINDIR")"
+STYLESDIR="$ROOTDIR/styles"
 
 cred="$(echo -ne '\033[0;31m')"
 ccyan="$(echo -ne '\033[0;36m')"
@@ -174,7 +172,7 @@ dump_dot() {
 image() {
   case $STYLE in
     white)
-      STYLE="$SCRIPTPATH/styles/white.gv"
+      STYLE="$STYLESDIR/white.gv"
       ;;
     */*)
       ;;
