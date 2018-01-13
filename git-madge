@@ -54,23 +54,6 @@ EOF
   exit 1
 }
 
-main() {
-  case "$COMMAND" in
-    sorted)
-      sorted "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
-      ;;
-    dot)
-      dump_dot "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
-      ;;
-    image)
-      image "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
-      ;;
-    *)
-      usage "Unrecognized subcommand: $COMMAND"
-      ;;
-  esac
-}
-
 # ----- option parsing --------------------------------------------------------
 
 COMMAND=""
@@ -112,6 +95,22 @@ fi
 
 REVIEW_BASE=${REVIEW_BASE:-master}
 STYLE=${STYLE:-white}
+main() {
+  case "$COMMAND" in
+    sorted)
+      sorted "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
+      ;;
+    dot)
+      dump_dot "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
+      ;;
+    image)
+      image "${MADGE_ARGV[@]+"${MADGE_ARGV[@]}"}"
+      ;;
+    *)
+      usage "Unrecognized subcommand: $COMMAND"
+      ;;
+  esac
+}
 
 
 # ----- helpers ---------------------------------------------------------------
