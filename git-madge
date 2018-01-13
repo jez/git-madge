@@ -65,21 +65,17 @@ while [[ $# -gt 0 ]]; do
   case $key in
     sorted|dot|image)
       COMMAND="$1"
-      shift
       ;;
     -b|--base)
       REVIEW_BASE="$2"
-      shift
       shift
       ;;
     -s|--style)
       STYLE="$2"
       shift
-      shift
       ;;
     --dpi)
       DPI="$2"
-      shift
       shift
       ;;
     -h)
@@ -87,9 +83,9 @@ while [[ $# -gt 0 ]]; do
       ;;
     *)
       MADGE_ARGV+=("$1")
-      shift
       ;;
   esac
+  shift
 done
 
 if [ -z "$COMMAND" ]; then
