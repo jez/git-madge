@@ -43,6 +43,7 @@ Options:
                                 that styles the graph. Available presets:
                                 $STYLES
                                 [default: white]
+  --dpi <dpi>                   Set the DPI of graphviz output to <dpi>.
   -h
 
 Madge Options:
@@ -57,6 +58,7 @@ EOF
 # ----- option parsing --------------------------------------------------------
 
 COMMAND=""
+DPI=""
 MADGE_ARGV=()
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -72,6 +74,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     -s|--style)
       STYLE="$2"
+      shift
+      shift
+      ;;
+    --dpi)
+      DPI="$2"
       shift
       shift
       ;;
@@ -95,6 +102,7 @@ fi
 
 REVIEW_BASE=${REVIEW_BASE:-master}
 STYLE=${STYLE:-white}
+
 main() {
   case "$COMMAND" in
     sorted)
@@ -173,6 +181,14 @@ dump_dot() {
 
 # --- image ---
 
+as_png() {
+  if [ -z "$DPI" ]; then
+    dot -Tpng
+  else
+    dot -Tpng "-Gdpi=$DPI"
+  fi
+}
+
 image() {
   case $STYLE in
     */*)
@@ -188,7 +204,7 @@ image() {
     (grep '.' || echo "Did any JavaScript files change on this branch?" | \
       stderr_in_red >&2) | \
     gvpr -c -f "$STYLE" | \
-    dot -Tpng
+    as_png
 }
 
 main
