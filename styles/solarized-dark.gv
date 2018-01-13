@@ -1,0 +1,20 @@
+BEG_G {
+  rankdir = "LR";
+  bgcolor = "#002B36";
+}
+
+N {
+  fontname = "Helvetica";
+  fontsize = "14px";
+  fontcolor = "#839496";
+  shape = "rectangle";
+  color = "#268bd2";
+}
+
+N [outdegree == 0] {
+  color = "#859900";
+}
+
+E {
+  color = "#839496";
+}

@@ -22,6 +22,10 @@ usage() {
     echo
   fi
 
+  local STYLES
+  STYLES="$(find "$STYLESDIR" -name '*.gv' -exec basename {} .gv \; | \
+    tr '\n' ' ')"
+
   cat <<EOF
 Git-aware madge.
 
@@ -36,7 +40,8 @@ Options:
                                 [default: master]
   -s <style>, --style <style>   Use <style> when generating a graphviz image.
                                 Can be a preset or a path to a graphviz program
-                                that styles the graph.
+                                that styles the graph. Available presets:
+                                $STYLES
                                 [default: white]
   -h
 
@@ -171,15 +176,14 @@ dump_dot() {
 
 image() {
   case $STYLE in
-    white)
-      STYLE="$STYLESDIR/white.gv"
-      ;;
     */*)
+      # --style has a '/' in it, so its a path to a stylesheet, not a preset
       ;;
     *)
-      usage "Unrecognized style: $STYLE."
+      STYLE="$STYLESDIR/$STYLE.gv"
       ;;
   esac
+  [ ! -f "$STYLE" ] && usage "Unrecognized style: $STYLE."
 
   dump_dot "$@" | \
     (grep '.' || echo "Did any JavaScript files change on this branch?" | \

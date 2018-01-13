@@ -1,0 +1,16 @@
+BEG_G {
+  rankdir = "LR";
+  bgcolor = "transparent";
+}
+
+N {
+  fontname = "Helvetica";
+  fontsize = "14px";
+  color = "black";
+  fontcolor = "black";
+  shape = "rectangle";
+}
+
+E {
+  color = "black";
+}
