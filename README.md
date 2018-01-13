@@ -71,8 +71,10 @@ Options:
                                 [default: master]
   -s <style>, --style <style>   Use <style> when generating a graphviz image.
                                 Can be a preset or a path to a graphviz program
-                                that styles the graph.
+                                that styles the graph. Available presets:
+                                black solarized-dark solarized-light white
                                 [default: white]
+  --dpi <dpi>                   Set the DPI of graphviz output to <dpi>.
   -h
 
 Madge Options:
